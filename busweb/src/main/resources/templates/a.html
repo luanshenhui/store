@@ -1,0 +1,45 @@
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<el-table  size='medium' :data="tableData" border style="width:100%"></el-table>
+<el-pagination
+        v-show="isPage"
+        @current-change="handleCurrentChange"
+        :current-page="page.currentPage"
+        :page-size="page.pageSize"
+        layout="total, prev, pager, next, jumper"
+        :total="page.totalCount"
+        background
+        style="float:right;margin:10px 20px 0 0;">
+</el-pagination>
+data() {
+return {
+tableData: [],
+page: {
+currentPage: 1, // 当前页
+pageSize: 10, // 每页显示条目个数
+totalCount: 0 // 总条目数
+},
+isPage: false
+}
+},
+methods:{
+getTableData(pageNo) {
+var self = this
+self.$http.post().then(res => {
+if (res.data.success) {
+if (res.data.data.result.length>0) {
+self.isPage = true
+}
+self.tableData = res.data.data.result
+self.$set(self.page, 'totalCount', res.data.data.total)
+self.$set(self.page, 'pageSize', res.data.data.pageSize)
+self.$set(self.page, 'currentPage', res.data.data.currentPage)
+}
+})
+.catch(function(error) {
+console.log(error)
+})
+},
+handleCurrentChange(val) {
+this.getTableData(val)
+}
+}
